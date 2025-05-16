@@ -4,3 +4,6 @@ frontend/.next/
 
 # Python
 backend/.venv/
+
+# Mac OS
+.DS_Store
