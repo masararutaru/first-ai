@@ -1,9 +1,22 @@
-# Node.js
+# --- Node (root & frontend) -------------------------
+node_modules/
 frontend/node_modules/
 frontend/.next/
 
-# Python
+# --- Python -----------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
 backend/.venv/
+*.log
 
-# Mac OS
+# --- Kaggle & ML data -------------------------------
+ml/data/           # raw/ processed/ まとめて除外
+kaggle.json
+
+# --- Secrets ----------------------------------------
+.env
+
+# --- OS / Editor junk -------------------------------
 .DS_Store
+Thumbs.db
