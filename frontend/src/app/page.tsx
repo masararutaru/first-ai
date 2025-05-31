@@ -1,6 +1,68 @@
+"use client";
 import Image from "next/image";
+import { useState, ChangeEvent } from "react";
+
+const TASKS = [
+  { key: "numeric", label: "数値分類" },
+  { key: "image", label: "画像分類" },
+  { key: "text", label: "テキスト分類" },
+];
 
 export default function Home() {
+  const [task, setTask] = useState("numeric");
+  const [input, setInput] = useState("1.0,2.0,3.0,4.0");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [textInput, setTextInput] = useState("");
+  const [result, setResult] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
+
+  const handlePredict = async () => {
+    setLoading(true);
+    setResult(null);
+    try {
+      let body: any = { task_name: task };
+      let headers: any = { "Content-Type": "application/json" };
+      let url = "http://localhost:8000/predict";
+      if (task === "numeric") {
+        const inputArr = input
+          .split("\n")
+          .map((row) => row.split(",").map(Number));
+        body.input_data = inputArr;
+      } else if (task === "image") {
+        // 画像はFormDataで送信
+        const formData = new FormData();
+        formData.append("task_name", task);
+        if (imageFile) formData.append("file", imageFile);
+        const res = await fetch(url, {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        setResult(JSON.stringify(data.prediction));
+        setLoading(false);
+        return;
+      } else if (task === "text") {
+        body.input_data = textInput;
+      }
+      const res = await fetch(url, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      setResult(JSON.stringify(data.prediction));
+    } catch (e) {
+      setResult("エラー: " + e);
+    }
+    setLoading(false);
+  };
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
@@ -12,43 +74,56 @@ export default function Home() {
           height={38}
           priority
         />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        <div className="flex flex-col gap-4 w-full max-w-md">
+          <label className="font-bold">タスク選択</label>
+          <select
+            className="border rounded p-2 text-sm bg-white text-black focus:outline-blue-400"
+            value={task}
+            onChange={(e) => setTask(e.target.value)}
+            style={{ minHeight: 40 }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+            {TASKS.map((t) => (
+              <option key={t.key} value={t.key}>{t.label}</option>
+            ))}
+          </select>
+          {task === "numeric" && (
+            <textarea
+              className="border rounded p-2 text-sm"
+              rows={3}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="1.0,2.0,3.0,4.0"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          )}
+          {task === "image" && (
+            <input
+              type="file"
+              accept="image/*"
+              className="border rounded p-2 text-sm"
+              onChange={handleImageChange}
+            />
+          )}
+          {task === "text" && (
+            <textarea
+              className="border rounded p-2 text-sm"
+              rows={3}
+              value={textInput}
+              onChange={(e) => setTextInput(e.target.value)}
+              placeholder="テキストを入力"
+            />
+          )}
+          <button
+            className="bg-blue-600 text-white rounded px-4 py-2 disabled:opacity-50"
+            onClick={handlePredict}
+            disabled={loading}
           >
-            Read our docs
-          </a>
+            {loading ? "推論中..." : "推論する"}
+          </button>
+          {result && (
+            <div className="mt-2 p-3 bg-blue-100 border border-blue-400 rounded text-base text-black font-bold text-center shadow">
+              推論結果: {result}
+            </div>
+          )}
         </div>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
