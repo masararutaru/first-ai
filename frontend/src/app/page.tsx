@@ -26,9 +26,9 @@ export default function Home() {
     setLoading(true);
     setResult(null);
     try {
-      let body: any = { task_name: task };
-      let headers: any = { "Content-Type": "application/json" };
-      let url = "http://localhost:8000/predict";
+      const body: Record<string, unknown> = { task_name: task };
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      const url = "http://localhost:8000/predict";
       if (task === "numeric") {
         const inputArr = input
           .split("\n")
@@ -75,8 +75,9 @@ export default function Home() {
           priority
         />
         <div className="flex flex-col gap-4 w-full max-w-md">
-          <label className="font-bold">タスク選択</label>
+          <label htmlFor="task-select" className="font-bold">タスク選択</label>
           <select
+            id="task-select"
             className="border rounded p-2 text-sm bg-white text-black focus:outline-blue-400"
             value={task}
             onChange={(e) => setTask(e.target.value)}
@@ -101,6 +102,7 @@ export default function Home() {
               accept="image/*"
               className="border rounded p-2 text-sm"
               onChange={handleImageChange}
+              aria-label="画像ファイルを選択"
             />
           )}
           {task === "text" && (
