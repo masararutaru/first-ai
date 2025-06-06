@@ -1,0 +1,103 @@
+---
+description: Used to manage (update, retrieve) plan for this project
+globs: 
+alwaysApply: false
+---
+# Rules for plan
+
+This document defines the structure and workflow for managing implementation planning through the `plan` folder.
+
+---
+
+## plan Folder Structure
+
+The `plan` folder contains the core planning files, all in Markdown format. These files work together to capture the current state of implementation and to plan the next steps:
+
+plan/
+├── activeContext.md
+├── progress.md
+└── flow/               ← New subdirectory for detailed PR-based plans
+    ├── [PR番号]_plan.md     ← Each file corresponds to a specific PR plan
+    └── ... (Additional PR plans)
+
+### Core Files (Required)
+
+1. `activeContext.md`
+   - Current work focus
+   - Recent changes
+   - Next steps
+   - Active decisions and considerations
+   - Important patterns and preferences
+   - Learnings and project insights
+
+6. `progress.md`
+   - What works
+   - What's left to build
+   - Current status
+   - Known issues
+   - Evolution of project decisions
+
+
+## Core Workflow
+
+flowchart TD
+    Start[Start] --> readDocs[Read Docs]
+    readDocs --> createPlan[Create Plan]
+    readDocs --> |don't exist| createDocs[Create Docs]
+    createPlan --> Documents[Documents in Chat]
+
+---
+
+## Plan Updates
+
+Plan updates occur when:
+
+1. Discovering new project patterns
+2. After implementing significant changes
+3. When user requests with **update plan** (MUST review ALL Core files)
+4. When context needs clarification 
+
+flowchart TD
+    Start[Update Process]
+    
+    subgraph Process
+        P1[Review ALL Files]
+        P2[Read `docs` and `plan`]
+        P3[Clarify Next Steps]
+        P4[Document Insights & Patterns]
+        
+        P1 --> P2 --> P3 --> P4
+    end
+    
+    Start --> Process
+
+
+## Plan Addition
+
+The **Plan Addition** process is a separate workflow from the global update plan. It is triggered by the `add plan` instruction and focuses on creating a detailed, PR-specific implementation plan.
+
+### Objectives
+
+- **Granular Planning**:  
+  Create detailed implementation plans based on the current context for each PR (Pull Request) unit. This includes a breakdown of specific tasks, design details, testing requirements, dependencies, and risk assessments.
+  
+- **Seamless Integration**:  
+  Although distinct from the `update plan` process, the new plans are integrated with the global context in `activeContext.md` and overall progress in `progress.md`.
+
+### Workflow for Plan Addition
+
+
+flowchart TD
+    Start[Add Plan Start]
+    ReadContext[Read Latest activeContext.md / progress.md]
+    DefinePR[Define PR-specific Implementation Details]
+    CreateDoc[Create New Plan Document in ./plan/implement/]
+    AddDetails[Add Detailed Tasks, Tests, Dependencies]
+    Complete[Complete & Share Plan]
+    
+    Start --> ReadContext --> DefinePR --> CreateDoc --> AddDetails --> Complete
+---
+
+Note: When triggered by **update plan**, I MUST review every docs file and plan file, even if some don't require updates. Focus particularly on activeContext.md and progress.md as they track current state.
+
+REMEMBER: After every memory reset, I begin completely fresh. The plan is my only link to previous work. It must be maintained with precision and clarity, as my effectiveness depends entirely on its accuracy.
