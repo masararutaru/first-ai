@@ -127,47 +127,7 @@ export default function Home() {
             </div>
           )}
         </div>
-
-        <div>
-          <label htmlFor="feature2" className="block text-sm font-medium mb-2">
-            特徴量 2 (オプション)
-          </label>
-          <input
-            id="feature2"
-            type="number"
-            step="any"
-            value={feature2}
-            onChange={(e) => setFeature2(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md"
-            placeholder="例: 4.56"
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={isLoading || !feature1}
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 disabled:bg-gray-400"
-        >
-          {isLoading ? '予測中...' : '予測する'}
-        </button>
-      </form>
-
-      {error && (
-        <div className="p-4 bg-red-100 text-red-700 rounded-md mb-4">
-          {error}
-        </div>
-      )}
-
-      {result && (
-        <div className="p-6 bg-green-50 rounded-md">
-          <h2 className="text-xl font-semibold mb-4">予測結果</h2>
-          <div className="space-y-2">
-            <p>予測値: {result.prediction.toFixed(4)}</p>
-            <p>信頼度: {(result.confidence * 100).toFixed(2)}%</p>
-            <p className="text-gray-600">{result.message}</p>
-          </div>
-        </div>
-      )}
-    </main>
+      </main>
+    </div>
   );
 }
