@@ -18,4 +18,4 @@ def predict(req: PredictRequest):
     # 入力データをnumpy配列に変換
     X = np.array(req.input_data)
     pred = selector.predict(req.model_name, X)
-    return PredictResponse(prediction=pred.tolist()) 
+    return PredictResponse(prediction=pred) 
