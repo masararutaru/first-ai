@@ -42,7 +42,7 @@ export default function Home() {
         const formData = new FormData();
         formData.append("task_name", task);
         if (imageFile) formData.append("file", imageFile);
-        const res = await fetch(url, {
+        const res = await fetch("http://localhost:8000/predict-image", {
           method: "POST",
           body: formData,
         });

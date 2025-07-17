@@ -4,4 +4,4 @@ scikit-learn
 matplotlib
 seaborn
 jupyter
-Pillow 
+Pillow fastapi
