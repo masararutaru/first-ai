@@ -5,6 +5,7 @@ import { useState, ChangeEvent } from "react";
 const TASKS = [
   { key: "numeric", label: "数値分類" },
   { key: "image", label: "画像分類" },
+  { key: "handwritten_digit", label: "手書き数字認識" },
   { key: "text", label: "テキスト分類" },
 ];
 
@@ -15,6 +16,7 @@ export default function Home() {
   const [textInput, setTextInput] = useState("");
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [processedImage, setProcessedImage] = useState<string | null>(null);
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -25,6 +27,7 @@ export default function Home() {
   const handlePredict = async () => {
     setLoading(true);
     setResult(null);
+    setProcessedImage(null);
     try {
       const body: Record<string, unknown> = { task_name: task };
       const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -34,17 +37,30 @@ export default function Home() {
           .split("\n")
           .map((row) => row.split(",").map(Number));
         body.input_data = inputArr;
-      } else if (task === "image") {
+      } else if (task === "image" || task === "handwritten_digit") {
         // 画像はFormDataで送信
         const formData = new FormData();
         formData.append("task_name", task);
         if (imageFile) formData.append("file", imageFile);
-        const res = await fetch(url, {
+        const res = await fetch("http://localhost:8000/predict-image", {
           method: "POST",
           body: formData,
         });
         const data = await res.json();
-        setResult(JSON.stringify(data.prediction));
+        
+        // 手書き数字認識の場合は結果をシンプルに表示
+        if (task === "handwritten_digit") {
+          const prediction = data.prediction;
+          setResult(`予測結果: ${prediction.predicted_digit}`);
+          
+          // 処理された画像を表示
+          if (prediction.processed_image) {
+            setProcessedImage(`data:image/png;base64,${prediction.processed_image}`);
+          }
+        } else {
+          setResult(JSON.stringify(data.prediction));
+        }
+        
         setLoading(false);
         return;
       } else if (task === "text") {
@@ -89,7 +105,7 @@ export default function Home() {
               placeholder="1.0,2.0,3.0,4.0"
             />
           )}
-          {task === "image" && (
+          {(task === "image" || task === "handwritten_digit") && (
             <input
               type="file"
               accept="image/*"
@@ -117,6 +133,20 @@ export default function Home() {
           {result && (
             <div className="mt-2 p-3 bg-blue-100 border border-blue-400 rounded text-base text-black font-bold text-center shadow">
               推論結果: {result}
+            </div>
+          )}
+          {processedImage && (
+            <div className="mt-2 p-3 bg-gray-100 border border-gray-400 rounded">
+              <h3 className="font-bold mb-2 text-black">モデルを適用した画像:</h3>
+              <img 
+                src={processedImage} 
+                alt="Processed image" 
+                className="border border-gray-300 rounded bg-white"
+                style={{ 
+                  imageRendering: 'pixelated',
+                  filter: 'invert(1) contrast(3) brightness(0.8)'
+                }}
+              />
             </div>
           )}
         </div>
