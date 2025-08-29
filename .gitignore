@@ -4,6 +4,13 @@ frontend/.next/
 
 # Python
 backend/.venv/
+ml/.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
 
 # Mac OS
 .DS_Store
