@@ -1,16 +1,38 @@
-# Node.js
+# --- Node (root & frontend) -------------------------
+node_modules/
 frontend/node_modules/
 frontend/.next/
 
-# Python
+# --- Python -----------------------------------------
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.venv/
+venv/
 backend/.venv/
 ml/.venv/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.so
+*.log
 
-# Mac OS
+# --- Kaggle & ML data -------------------------------
+ml/data/           # raw/ processed/ まとめて除外
+kaggle.json
+
+# --- ML Models & Weights ----------------------------
+*.joblib
+*.pkl
+*.h5
+*.pth
+*.bin
+*.model
+*.weights
+*.safetensors
+ml/src/models/*/models/
+ml/src/models/*/checkpoints/
+ml/src/models/*/logs/
+
+# --- Secrets ----------------------------------------
+.env
+
+# --- OS / Editor junk -------------------------------
 .DS_Store
+Thumbs.db
